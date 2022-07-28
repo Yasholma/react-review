@@ -1,56 +1,49 @@
-import React, { BaseSyntheticEvent, Component } from "react";
+import React, { BaseSyntheticEvent, useEffect, useState } from "react";
 import CardList from "./components/card-list/card-list.component";
 
 import "./App.css";
-import { IAppState, IMonster } from "./interfaces";
+import { IMonster } from "./interfaces";
 import SearchBox from "./components/search-box/search-box.component";
 
-class App extends Component {
-  constructor(props: any) {
-    super(props);
-    console.log("App constructor >>");
-  }
+const App: React.FunctionComponent = () => {
+  const [monsters, setMonsters] = useState<IMonster[]>([]);
+  const [searchField, setSearchField] = useState<string>("");
+  const [filteredMonsters, setFilteredMonsters] =
+    useState<IMonster[]>(monsters);
 
-  state: IAppState = {
-    monsters: [],
-    searchField: "",
-  };
+  useEffect(() => {
+    const fetchMonsters = async () => {
+      const res = await fetch("https://jsonplaceholder.typicode.com/users");
+      const data = await res.json();
+      setMonsters(data);
+    };
 
-  async componentDidMount(): Promise<void> {
-    console.log("App componentDidMount >>");
-    const res = await fetch("https://jsonplaceholder.typicode.com/users");
-    const data = await res.json();
-    this.setState((prevState) => ({ ...prevState, monsters: data }));
-  }
+    fetchMonsters();
+  }, []);
 
-  onSearchChange = (e: BaseSyntheticEvent) => {
-    this.setState((prevState: IAppState) => ({
-      ...prevState,
-      searchField: e.target.value.toLowerCase(),
-    }));
-  };
-
-  render(): React.ReactNode {
-    console.log("App render >>");
-    const { monsters, searchField } = this.state;
-    const { onSearchChange } = this;
-
-    const filteredMonsters = monsters.filter((monster: IMonster) =>
-      monster.name.toLowerCase().includes(searchField)
+  useEffect(() => {
+    const newFilteredMonsters: IMonster[] = monsters.filter(
+      (monster: IMonster) => monster.name.toLowerCase().includes(searchField)
     );
 
-    return (
-      <div className="App">
-        <h1 className="app-title">Freezy Monsters</h1>
-        <SearchBox
-          onChangeHandler={this.onSearchChange}
-          placeholder="Search Monsters"
-          className="monsters-search-box"
-        />
-        <CardList monsters={filteredMonsters} />
-      </div>
-    );
-  }
-}
+    setFilteredMonsters(newFilteredMonsters);
+  }, [monsters, searchField]);
+
+  const onSearchChange = (e: BaseSyntheticEvent): void => {
+    setSearchField(e.target.value.toLowerCase());
+  };
+
+  return (
+    <div className="App">
+      <h1 className="app-title">Freezy Monsters</h1>
+      <SearchBox
+        onChangeHandler={onSearchChange}
+        placeholder="Search Monsters"
+        className="monsters-search-box"
+      />
+      <CardList monsters={filteredMonsters} />{" "}
+    </div>
+  );
+};
 
 export default App;

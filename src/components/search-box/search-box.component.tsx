@@ -1,4 +1,4 @@
-import { BaseSyntheticEvent, Component, ReactNode } from "react";
+import { BaseSyntheticEvent } from "react";
 
 import "./search-box.styles.css";
 
@@ -8,21 +8,17 @@ interface SearchBoxProps {
   className: string;
 }
 
-class SearchBox extends Component<SearchBoxProps> {
-  render(): ReactNode {
-    console.log("SearchBox render");
-
-    const { onChangeHandler, placeholder, className } = this.props;
-
-    return (
-      <input
-        type="search"
-        className={`search-box ${className}`}
-        placeholder={placeholder}
-        onChange={onChangeHandler}
-      />
-    );
-  }
-}
+const SearchBox: React.FunctionComponent<SearchBoxProps> = ({
+  onChangeHandler,
+  placeholder,
+  className,
+}: SearchBoxProps) => (
+  <input
+    type="search"
+    className={`search-box ${className}`}
+    placeholder={placeholder}
+    onChange={onChangeHandler}
+  />
+);
 
 export default SearchBox;
